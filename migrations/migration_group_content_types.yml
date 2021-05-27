@@ -1,0 +1,13 @@
+id: migration_group_content_types
+label: 'Migrate Group Content Types'
+migration_tags:
+  - 'Drupal 7'
+  - 'Organic Groups'
+migration_group: insert_group
+source:
+  plugin: migration_group_d7_og_group_content_types
+process:
+  id: type
+destination:
+  plugin: migration_group:group_content_type
+migration_dependencies: null

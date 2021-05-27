@@ -1,0 +1,23 @@
+id: migration_group_types
+label: 'Migrate Group Types'
+migration_tags:
+  - 'Drupal 7'
+  - 'Organic Groups'
+migration_group: insert_group
+source:
+  plugin: migration_group_d7_og_node_types
+  constants:
+    boolean_true: 1
+    boolean_false: 0
+process:
+  id: type
+  label: name
+  description: description
+  creator_membership: 'constants/boolean_true'
+  creator_wizard: 'constants/boolean_false'
+  add_admin_role: 'constants/boolean_true'
+  assign_admin_role: 'constants/boolean_true'
+  creator_roles: {}
+destination:
+  plugin: entity:group_type
+migration_dependencies: null

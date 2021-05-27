@@ -1,0 +1,24 @@
+id: migration_group_roles
+label: 'Migrate Group Roles'
+migration_tags:
+  - 'Drupal 7'
+  - 'Organic Groups'
+migration_group: insert_group
+source:
+  plugin: migration_group_d7_og_group_roles
+process:
+  id:
+    -
+      plugin: concat
+      source:
+        - group_bundle
+        - role_machine_name
+      delimiter: '-'
+    -
+      plugin: migration_group_hashed_id
+  label: name
+  group_type: group_bundle
+  permissions: {}
+destination:
+  plugin: entity:group_role
+migration_dependencies: null

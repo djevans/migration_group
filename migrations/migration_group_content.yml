@@ -1,0 +1,21 @@
+id: migration_group_content
+label: 'Migrate Group Content'
+migration_tags:
+  - 'Drupal 7'
+  - 'Organic Groups'
+migration_group: insert_group
+source:
+  plugin: migration_group_d7_og_membership
+  og_group_type: node
+  entity_type: node
+  group_type: working_group
+  content_plugin: 'group_node:working_group_topic'
+process:
+  type: group_content_type_id
+  gid: gid
+  entity_id: etid
+  uid: uid
+  created: created
+destination:
+  plugin: entity:group_content
+migration_dependencies: null

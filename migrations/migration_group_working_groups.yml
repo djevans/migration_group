@@ -1,0 +1,19 @@
+id: migration_group_working_groups
+label: 'Insert Working Groups'
+migration_tags:
+  - 'Drupal 7'
+  - 'Organic Groups'
+migration_group: insert_group
+source:
+  plugin: d7_node
+  node_type: working_group
+process:
+  type: type
+  id: nid
+  label: title
+  path: alias
+destination:
+  plugin: 'entity:group'
+migration_dependencies:
+  required:
+    - migration_group_types

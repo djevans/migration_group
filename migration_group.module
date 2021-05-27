@@ -1,0 +1,24 @@
+<?php
+
+/**
+ * @file
+ * Contains migration_group.module.
+ */
+
+use Drupal\Core\Routing\RouteMatchInterface;
+
+/**
+ * Implements hook_help().
+ */
+function migration_group_help($route_name, RouteMatchInterface $route_match) {
+  switch ($route_name) {
+    // Main module help for the migration_group module.
+    case 'help.page.migration_group':
+      $output = '';
+      $output .= '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Migrates Drupal 7 Organic Groups to Drupal 8 Group') . '</p>';
+      return $output;
+
+    default:
+  }
+}
