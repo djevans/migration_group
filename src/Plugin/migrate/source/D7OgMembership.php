@@ -10,16 +10,9 @@ use Drupal\migrate\Row;
 use Drupal\migrate_drupal\Plugin\migrate\source\DrupalSqlBase;
 
 /**
- * Migrate source plugin for Drupal 7 {og_membership}.
- *
- * @MigrateSource(
- *   id = "migration_group_d7_og_membership",
- *   source_module = "og"
- * )
- *
- * @internal
+ * Migrate source plugin base for Drupal 7 {og_membership}.
  */
-class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
+abstract class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
 
   /**
    * {@inheritdoc}
@@ -36,10 +29,12 @@ class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
     $entity_type = $this->configuration['entity_type'];
     $group_type = $this->configuration['og_group_type'];
 
-    return $this->select('og_membership', 'ogm')
-      ->fields('ogm')
-      ->condition('entity_type', $entity_type)
-      ->condition('group_type', $group_type);
+    $query = $this->select('og_membership', 'ogm');
+    $query->condition('entity_type', $entity_type)
+          ->condition('group_type', $group_type);
+    $query->fields('ogm');
+
+    return $query;
   }
 
   /**
@@ -52,7 +47,7 @@ class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
       'etid' => $this->t('The member entity\'s ID'),
       'entity_type' => $this->t('The member entity\'s type'),
       'gid' => $this->t('The group ID'),
-      'group_type' => $this->t('The ID of the membership'),
+      'group_type' => $this->t('The group\'s entity type'),
       'state' => $this->t('The state of the membership'),
       'created' => $this->t('The time the membership was created'),
       'field_name' => $this->t('The ID of the membership'),
@@ -69,33 +64,21 @@ class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
     return $ids;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public function prepareRow(Row $row): bool {
 
-    $storage = \Drupal::entityTypeManager()->getStorage('group_content_type');
+    $storage = $this->entityTypeManager->getStorage('group_content_type');
+    $content_plugin_id = $this->getContentPluginId($row);
+
     /** @var \Drupal\group\Entity\GroupContentTypeInterface[] $plugins */
     $plugins = $storage->loadByProperties([
       'group_type' => $this->configuration['group_type'],
-      'content_plugin' => $this->configuration['content_plugin'],
+      'content_plugin' => $content_plugin_id,
     ]);
     if ($plugins) {
       $row->setSourceProperty('group_content_type_id', reset($plugins)->id());
-    }
-
-    if ($this->isUserMembershipMigration()) {
-      $roles = [];
-      $results = $this->select('og_users_roles', 'ogur')
-        ->fields('ogur', ['rid'])
-        ->condition('ogur.uid', $row->getSourceProperty('etid'))
-        ->condition('ogur.gid', $row->getSourceProperty('gid'))
-        ->condition('ogur.group_type', $row->getSourceProperty('group_type'))
-        ->execute()
-        ->fetchAllKeyed(0, 0);
-
-      if (!empty($results)) {
-        $rids = array_values($results);
-        $roles = array_map(function($rid) { return ['rid' => $rid]; }, $rids);
-        $row->setSourceProperty('roles', $roles);
-      }
     }
 
     return parent::prepareRow($row);
@@ -124,15 +107,16 @@ class D7OgMembership extends DrupalSqlBase implements ConfigurableInterface {
       'group_type' => 'node',
     ];
   }
+
   /**
-   * Determines if this source is configured for users or other entities.
+   * Get the correct group content plugin ID for a given result row.
    *
-   * @return bool
-   *   TRUE if the migration is for users.
+   * @param \Drupal\migrate\Row $row
+   *   The source row.
+   *
+   * @return string
+   *   The ID of the group content plugin.
    */
-  protected function isUserMembershipMigration(): bool {
-    $entity_type = $this->configuration['entity_type'] ?? 'any';
-    return ('user' === $entity_type);
-  }
+  abstract protected function getContentPluginId(Row $row): string;
 
 }
