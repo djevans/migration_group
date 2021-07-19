@@ -21,4 +21,6 @@ process:
   permissions: {}
 destination:
   plugin: entity:group_role
-migration_dependencies: null
+migration_dependencies:
+  required:
+    - migration_group_types

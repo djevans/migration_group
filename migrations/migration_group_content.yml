@@ -5,11 +5,10 @@ migration_tags:
   - 'Organic Groups'
 migration_group: insert_group
 source:
-  plugin: migration_group_d7_og_membership
+  plugin: migration_group_d7_og_membership_nodes
   og_group_type: node
   entity_type: node
   group_type: working_group
-  content_plugin: 'group_node:working_group_topic'
 process:
   type: group_content_type_id
   gid: gid
@@ -18,4 +17,6 @@ process:
   created: created
 destination:
   plugin: entity:group_content
-migration_dependencies: null
+migration_dependencies:
+  required:
+    - migration_group_working_groups
